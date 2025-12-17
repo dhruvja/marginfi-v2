@@ -25,7 +25,8 @@ use marginfi_type_crate::types::{
 };
 use prelude::*;
 
-pub use id_crate::ID;
+// pub use id_crate::ID;
+declare_id!("4sbjN16fgtnGMFaJ6s7aw9ha1uUQ9qLBv5gHSui2aNUU");
 
 // #[cfg(target_os = "solana")]
 // /// Custom heap allocator that exposes a move_cursor method. This allows us to manually deallocate

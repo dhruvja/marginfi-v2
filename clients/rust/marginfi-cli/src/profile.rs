@@ -74,7 +74,7 @@ impl Profile {
             match cluster {
                 Cluster::Localnet => pubkey!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"),
                 Cluster::Devnet => pubkey!("mf2iDQbVTAE3tT4tgAZBhBAmKUW56GsXX7H3oeH4atr"),
-                Cluster::Mainnet => pubkey!("MFv2hWf31Z9kbCa1snEPYctwafyhdvnV7FZnsebVacA"),
+                Cluster::Mainnet => pubkey!("4sbjN16fgtnGMFaJ6s7aw9ha1uUQ9qLBv5gHSui2aNUU"),
                 _ => bail!("cluster {:?} does not have a default target program ID, please provide it through the --pid option", cluster)
             }
         }
