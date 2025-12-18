@@ -2,6 +2,7 @@
 resolver = "2"
 members = [
     "programs/marginfi",
+    "programs/liquidity-incentive-program",
     "test-utils",
     "programs/mocks",
     "programs/test_transfer_hook",

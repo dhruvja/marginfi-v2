@@ -24,6 +24,8 @@ use solana_program_test::BanksClientError;
 use solana_program_test::ProgramTestContext;
 use solana_sdk::{commitment_config::CommitmentLevel, signer::Signer, transaction::Transaction};
 use std::{cell::RefCell, fmt::Debug, rc::Rc};
+#[cfg(feature = "lip")]
+use solana_sdk::signature::Keypair;
 
 #[derive(Clone)]
 pub struct BankFixture {
@@ -146,6 +148,67 @@ impl BankFixture {
             .await?;
 
         Ok(())
+    }
+
+    #[cfg(feature = "lip")]
+    pub async fn try_create_campaign(
+        &self,
+        lockup_period: u64,
+        max_deposits: u64,
+        max_rewards: u64,
+        reward_funding_account: Pubkey,
+    ) -> Result<crate::lip::LipCampaignFixture, BanksClientError> {
+        use crate::prelude::lip::*;
+
+        let campaign_key = Keypair::new();
+
+        let bank = self.load().await;
+
+        let ix = Instruction {
+            program_id: liquidity_incentive_program::id(),
+            accounts: liquidity_incentive_program::accounts::CreateCampaign {
+                campaign: campaign_key.pubkey(),
+                campaign_reward_vault: get_reward_vault_address(campaign_key.pubkey()).0,
+                campaign_reward_vault_authority: get_reward_vault_authority(campaign_key.pubkey())
+                    .0,
+                asset_mint: bank.mint,
+                marginfi_bank: self.key,
+                admin: self.ctx.borrow().payer.pubkey(),
+                funding_account: reward_funding_account,
+                token_program: self.get_token_program(),
+                system_program: solana_program::system_program::id(),
+            }
+            .to_account_metas(Some(true)),
+            data: liquidity_incentive_program::instruction::CreateCampaign {
+                lockup_period,
+                max_deposits,
+                max_rewards,
+            }
+            .data(),
+        };
+
+        let tx = {
+            let ctx = self.ctx.borrow_mut();
+
+            Transaction::new_signed_with_payer(
+                &[ix],
+                Some(&ctx.payer.pubkey()),
+                &[&ctx.payer, &campaign_key],
+                ctx.last_blockhash,
+            )
+        };
+
+        self.ctx
+            .borrow_mut()
+            .banks_client
+            .process_transaction(tx)
+            .await?;
+
+        Ok(crate::lip::LipCampaignFixture::new(
+            self.ctx.clone(),
+            self.clone(),
+            campaign_key.pubkey(),
+        ))
     }
 
     pub async fn try_setup_emissions(

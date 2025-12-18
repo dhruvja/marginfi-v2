@@ -5,7 +5,7 @@ publish = false
 edition = "2021"
 
 [features]
-# lip = ["liquidity-incentive-program"]
+lip = ["liquidity-incentive-program"]
 
 [dependencies]
 marginfi-type-crate = { workspace = true, features = ["anchor"] }
@@ -46,6 +46,6 @@ transfer_hook = { workspace = true, package = "test_transfer_hook", features = [
 ] }
 mocks = {workspace = true, features = ["no-entrypoint"] }
 
-# [dependencies.liquidity-incentive-program]
-# path = "../programs/liquidity-incentive-program"
-# optional = true
+[dependencies.liquidity-incentive-program]
+path = "../programs/liquidity-incentive-program"
+optional = true
