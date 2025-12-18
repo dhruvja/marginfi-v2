@@ -3,11 +3,11 @@ use instructions::*;
 
 cfg_if::cfg_if! {
     if #[cfg(feature = "mainnet-beta")] {
-        declare_id!("LipsxuAkFkwa4RKNzn51wAsW7Dedzt1RNHMkTkDEZUW");
+        declare_id!("6b91F7faJBc4c3qa4ctW7MK7b6oAmDTt1z6BGChYs5Rj");
     } else if #[cfg(feature = "devnet")] {
-        declare_id!("sexyDKo4Khm38YdJeiRdNNd5aMQqNtfDkxv7MnYNFeU");
+        declare_id!("6b91F7faJBc4c3qa4ctW7MK7b6oAmDTt1z6BGChYs5Rj");
     } else {
-        declare_id!("Lip1111111111111111111111111111111111111111");
+        declare_id!("6b91F7faJBc4c3qa4ctW7MK7b6oAmDTt1z6BGChYs5Rj");
     }
 }
 

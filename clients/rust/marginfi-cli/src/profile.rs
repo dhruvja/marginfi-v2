@@ -90,7 +90,7 @@ impl Profile {
         let program = client.program(program_id).unwrap();
         let lip_program = client
             .program(match cluster {
-                Cluster::Mainnet => pubkey!("LipsxuAkFkwa4RKNzn51wAsW7Dedzt1RNHMkTkDEZUW"),
+                Cluster::Mainnet => pubkey!("6b91F7faJBc4c3qa4ctW7MK7b6oAmDTt1z6BGChYs5Rj"),
                 Cluster::Devnet => pubkey!("sexyDKo4Khm38YdJeiRdNNd5aMQqNtfDkxv7MnYNFeU"),
                 _ => bail!(
                     "cluster {:?} doesn't have a default program ID for the LIP",

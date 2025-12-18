@@ -22,7 +22,7 @@ if [ "$cluster" = "mainnet" ]; then
     rpc_moniker="main"
 elif [ "$cluster" = "devnet" ]; then
     cluster_feature=" devnet"
-    program_id="LipsxuAkFkwa4RKNzn51wAsW7Dedzt1RNHMkTkDEZUW"
+    program_id="6b91F7faJBc4c3qa4ctW7MK7b6oAmDTt1z6BGChYs5Rj"
     rpc_moniker="dev"
 else
     echo "Error: Unknown cluster: $cluster"
