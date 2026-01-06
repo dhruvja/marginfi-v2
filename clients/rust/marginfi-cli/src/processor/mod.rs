@@ -2,6 +2,7 @@ pub mod admin;
 pub mod emissions;
 pub mod group;
 pub mod oracle;
+pub mod token;
 
 use {
     crate::{

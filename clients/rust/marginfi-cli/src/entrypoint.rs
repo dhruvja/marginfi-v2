@@ -50,6 +50,10 @@ pub enum Command {
         #[clap(subcommand)]
         subcmd: AccountCommand,
     },
+    Token {
+        #[clap(subcommand)]
+        subcmd: TokenCommand,
+    },
     //
     // InspectSwitchboardFeed { switchboard_feed: Pubkey },
     ShowOracleAges {
@@ -455,6 +459,55 @@ pub enum AccountCommand {
     },
 }
 
+#[derive(Debug, Parser)]
+pub enum TokenCommand {
+    /// Create a new SPL token mint
+    Create {
+        /// Number of decimals for the token (default: 9)
+        #[clap(long, default_value = "9")]
+        decimals: u8,
+        /// Optional mint authority (defaults to wallet)
+        #[clap(long)]
+        mint_authority: Option<Pubkey>,
+        /// Optional freeze authority
+        #[clap(long)]
+        freeze_authority: Option<Pubkey>,
+    },
+    /// Mint tokens to a destination account
+    Mint {
+        /// The mint address of the token
+        #[clap(long)]
+        mint: Pubkey,
+        /// Amount to mint (in UI units, e.g., 100.5)
+        #[clap(long)]
+        amount: f64,
+        /// Destination wallet address (will create ATA if needed)
+        #[clap(long)]
+        to: Pubkey,
+    },
+    /// Transfer tokens to another account
+    Transfer {
+        /// The mint address of the token
+        #[clap(long)]
+        mint: Pubkey,
+        /// Amount to transfer (in UI units)
+        #[clap(long)]
+        amount: f64,
+        /// Destination wallet address
+        #[clap(long)]
+        to: Pubkey,
+    },
+    /// Get token balance for an account
+    Balance {
+        /// The mint address of the token
+        #[clap(long)]
+        mint: Pubkey,
+        /// Wallet address (defaults to current wallet)
+        #[clap(long)]
+        owner: Option<Pubkey>,
+    },
+}
+
 pub fn entry(opts: Opts) -> Result<()> {
     env_logger::init();
 
@@ -464,6 +517,8 @@ pub fn entry(opts: Opts) -> Result<()> {
         Command::Profile { subcmd } => profile(subcmd),
 
         Command::Account { subcmd } => process_account_subcmd(subcmd, &opts.cfg_override),
+
+        Command::Token { subcmd } => process_token_subcmd(subcmd, &opts.cfg_override),
 
         Command::InspectSize {} => inspect_size(),
 
@@ -954,6 +1009,33 @@ fn process_account_subcmd(subcmd: AccountCommand, global_options: &GlobalOptions
     }?;
 
     Ok(())
+}
+
+fn process_token_subcmd(subcmd: TokenCommand, global_options: &GlobalOptions) -> Result<()> {
+    let profile = load_profile()?;
+    let config = profile.get_config(Some(global_options))?;
+
+    if !global_options.skip_confirmation {
+        match subcmd {
+            TokenCommand::Balance { .. } => (),
+            _ => get_consent(&subcmd, &profile)?,
+        }
+    }
+
+    match subcmd {
+        TokenCommand::Create {
+            decimals,
+            mint_authority,
+            freeze_authority,
+        } => processor::token::create_token(&config, decimals, mint_authority, freeze_authority),
+        TokenCommand::Mint { mint, amount, to } => {
+            processor::token::mint_tokens(&config, mint, amount, to)
+        }
+        TokenCommand::Transfer { mint, amount, to } => {
+            processor::token::transfer_tokens(&config, mint, amount, to)
+        }
+        TokenCommand::Balance { mint, owner } => processor::token::get_balance(&config, mint, owner),
+    }
 }
 
 fn get_consent<T: std::fmt::Debug>(cmd: T, profile: &Profile) -> Result<()> {

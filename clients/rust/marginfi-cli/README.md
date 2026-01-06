@@ -22,6 +22,11 @@ A command-line interface for interacting with the Marginfi lending protocol on S
   - [Borrow](#4-borrow)
   - [Liquidate](#5-liquidate)
 - [Query Commands](#query-commands)
+- [Token Commands](#token-commands)
+  - [Create Token](#1-create-token)
+  - [Mint Tokens](#2-mint-tokens)
+  - [Transfer Tokens](#3-transfer-tokens)
+  - [Check Balance](#4-check-balance)
 - [Parameter Reference](#parameter-reference)
 
 ---
@@ -531,6 +536,137 @@ cargo run --bin mfi show-oracle-ages
 
 # Show only stale oracles
 cargo run --bin mfi show-oracle-ages --only-stale
+```
+
+---
+
+## Token Commands
+
+Utility commands for creating and managing SPL tokens. Useful for testing and development.
+
+### 1. Create Token
+
+Create a new SPL token mint.
+
+```bash
+cargo run --bin mfi token create
+```
+
+**With optional parameters:**
+```bash
+cargo run --bin mfi token create \
+  --decimals 6 \
+  --mint-authority <AUTHORITY_PUBKEY> \
+  --freeze-authority <FREEZE_AUTHORITY_PUBKEY>
+```
+
+**Parameters:**
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `--decimals` | Number of decimal places for the token | `9` |
+| `--mint-authority` | Pubkey that can mint new tokens | Your wallet |
+| `--freeze-authority` | Pubkey that can freeze token accounts | None |
+
+**Example output:**
+```
+Token mint created successfully!
+Mint address: 7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU
+Decimals: 9
+Mint authority: BsHLjrzrStpW5aWgGh9qRt8bQtLiymfUcKqS5d6nKG9f
+Signature: 5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp...
+```
+
+---
+
+### 2. Mint Tokens
+
+Mint tokens to a destination wallet. Creates the Associated Token Account (ATA) if it doesn't exist.
+
+```bash
+cargo run --bin mfi token mint \
+  --mint <MINT_ADDRESS> \
+  --amount <AMOUNT> \
+  --to <DESTINATION_WALLET>
+```
+
+**Example - Mint 1000 tokens:**
+```bash
+cargo run --bin mfi token mint \
+  --mint 7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU \
+  --amount 1000.0 \
+  --to BsHLjrzrStpW5aWgGh9qRt8bQtLiymfUcKqS5d6nKG9f
+```
+
+**Parameters:**
+| Parameter | Description |
+|-----------|-------------|
+| `--mint` | The token mint address |
+| `--amount` | Amount to mint in UI units (e.g., `100.5`) |
+| `--to` | Destination wallet address (ATA will be created if needed) |
+
+**Note:** You must be the mint authority to mint tokens.
+
+---
+
+### 3. Transfer Tokens
+
+Transfer tokens from your wallet to another wallet.
+
+```bash
+cargo run --bin mfi token transfer \
+  --mint <MINT_ADDRESS> \
+  --amount <AMOUNT> \
+  --to <DESTINATION_WALLET>
+```
+
+**Example - Transfer 50 tokens:**
+```bash
+cargo run --bin mfi token transfer \
+  --mint 7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU \
+  --amount 50.0 \
+  --to 9aE476sH92Vz7DMPyq5WLPkrKWivxeuTKEFKd2sZZcde
+```
+
+**Parameters:**
+| Parameter | Description |
+|-----------|-------------|
+| `--mint` | The token mint address |
+| `--amount` | Amount to transfer in UI units |
+| `--to` | Destination wallet address (ATA will be created if needed) |
+
+---
+
+### 4. Check Balance
+
+Get the token balance for a wallet.
+
+```bash
+cargo run --bin mfi token balance \
+  --mint <MINT_ADDRESS>
+```
+
+**Check another wallet's balance:**
+```bash
+cargo run --bin mfi token balance \
+  --mint <MINT_ADDRESS> \
+  --owner <WALLET_ADDRESS>
+```
+
+**Parameters:**
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `--mint` | The token mint address | Required |
+| `--owner` | Wallet address to check | Your wallet |
+
+**Example output:**
+```
+Token Balance
+=============
+Mint: 7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU
+Owner: BsHLjrzrStpW5aWgGh9qRt8bQtLiymfUcKqS5d6nKG9f
+Token Account (ATA): 3fGHmKE8LHr5Bxyz...
+Balance: 1000 (native: 1000000000000)
+Decimals: 9
 ```
 
 ---
